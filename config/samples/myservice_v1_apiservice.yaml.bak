@@ -1,0 +1,9 @@
+apiVersion: myservice.cyk.io/v1
+kind: Apiservice
+metadata:
+  labels:
+    app.kubernetes.io/name: k8s-opreator
+    app.kubernetes.io/managed-by: kustomize
+  name: apiservice-sample
+spec:
+  # TODO(user): Add fields here

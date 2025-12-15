@@ -6,4 +6,33 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: apiservice-sample
 spec:
-  # TODO(user): Add fields here
+  # 副本数（可选，默认为0）
+  replicas: 2
+  
+  # 容器镜像（必需）
+  image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/nginx:1.26
+  
+  # 端口（必需）
+  port: 80
+  
+  # 环境变量（可选）
+  env:
+    - name: ENV_VAR_1
+      value: "value1"
+    - name: ENV_VAR_2
+      value: "value2"
+  
+  # 资源限制（可选）
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  
+  # 示例字段（可选）
+  foo: "example"
+  
+  # 测试字段（可选）
+  testSpec: "test"
