@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -186,7 +187,7 @@ func (r *ApiserviceReconciler) deploymentForApiservice(apiservice *myservicev1.A
 		},
 	}
 
-	// 设置WebApp为Deployment的Owner
+	// 设置Apiservice为Deployment的Owner
 	controllerutil.SetControllerReference(apiservice, dep, r.Scheme)
 	return dep
 }
@@ -233,7 +234,7 @@ func (r *ApiserviceReconciler) updateStatus(ctx context.Context, apiservice *mys
 	latestApiservice.Status.AvailableReplicas = deployment.Status.AvailableReplicas
 	latestApiservice.Status.ServiceEndpoint = fmt.Sprintf("%s:%d", apiservice.Name, apiservice.Spec.Port)
 
-	// 添加条件
+	// 设置条件（如果已存在相同 Type 的条件，则更新；否则添加）
 	condition := metav1.Condition{
 		Type:               "Available",
 		Status:             metav1.ConditionTrue,
@@ -242,7 +243,8 @@ func (r *ApiserviceReconciler) updateStatus(ctx context.Context, apiservice *mys
 		LastTransitionTime: metav1.Now(),
 	}
 
-	latestApiservice.Status.Conditions = append(latestApiservice.Status.Conditions, condition)
+	// 使用 meta.SetStatusCondition 来设置条件，它会自动处理重复的 Type
+	meta.SetStatusCondition(&latestApiservice.Status.Conditions, condition)
 
 	// 更新状态
 	return r.Status().Update(ctx, latestApiservice)
